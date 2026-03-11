@@ -116,6 +116,10 @@ jobs:
 
           echo "Deploying to bucket: $TARGET_BUCKET at endpoint: $TARGET_ENDPOINT"
 
+          # 腾讯云 COS 强制要求使用虚拟托管样式的域名 (Virtual Hosted-Style)
+          # 我们需要配置 AWS CLI 强制使用此模式，而不是路径模式
+          aws configure set default.s3.addressing_style virtual
+
           aws s3 sync ./dist s3://$TARGET_BUCKET/ \
             --endpoint-url $TARGET_ENDPOINT \
             --delete \
