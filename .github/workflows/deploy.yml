@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22' # Astro 要求的 Node 版本
+          node-version: "22" # Astro 要求的 Node 版本
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -41,21 +41,21 @@ jobs:
             const crypto = require('crypto');
             const accessKey = process.env.DOGE_ACCESS_KEY;
             const secretKey = process.env.DOGE_SECRET_KEY;
-            
+
             // 多吉云获取临时密钥的 API 路径
             const apiPath = '/auth/tmp_token.json';
-            
+
             // 请求体：请求 OSS_FULL (完全控制) 权限，范围为整个存储空间
             const body = JSON.stringify({
               channel: 'OSS_FULL',
               scopes: ['*']
             });
-            
+
             // 签名算法：HMAC-SHA1(apiPath + \n + body)
             const signStr = apiPath + '\n' + body;
             const sign = crypto.createHmac('sha1', secretKey).update(Buffer.from(signStr, 'utf8')).digest('hex');
             const authorization = 'TOKEN ' + accessKey + ':' + sign;
-            
+
             // 将生成的 Authorization 头和 Body 传递给下一步
             core.setOutput('authorization', authorization);
             core.setOutput('body', body);
@@ -63,42 +63,60 @@ jobs:
       # 2. 调用多吉云 API 获取临时密钥 (STS) 和 s3Endpoint
       - name: Get Temporary Credentials
         id: get_sts
+        env:
+          DOGE_BUCKET_NAME: ${{ secrets.DOGE_BUCKET_NAME }}
         run: |
           RESPONSE=$(curl -s -X POST "https://api.dogecloud.com/auth/tmp_token.json" \
             -H "Content-Type: application/json" \
             -H "Authorization: ${{ steps.doge_token.outputs.authorization }}" \
             -d '${{ steps.doge_token.outputs.body }}')
-          
+
           # 检查 API 是否返回 200
           CODE=$(echo $RESPONSE | jq -r '.code')
           if [ "$CODE" != "200" ]; then
             echo "API Error: $(echo $RESPONSE | jq -r '.msg')"
             exit 1
           fi
-          
+
           # 提取临时密钥
           echo "AWS_ACCESS_KEY_ID=$(echo $RESPONSE | jq -r '.data.Credentials.accessKeyId')" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=$(echo $RESPONSE | jq -r '.data.Credentials.secretAccessKey')" >> $GITHUB_ENV
           echo "AWS_SESSION_TOKEN=$(echo $RESPONSE | jq -r '.data.Credentials.sessionToken')" >> $GITHUB_ENV
-          
-          # 提取 s3Endpoint 和 s3Bucket (如果用户没有在 secrets 中配置 BUCKET_NAME，就用 API 返回的第一个)
-          echo "S3_ENDPOINT=$(echo $RESPONSE | jq -r '.data.Buckets[0].s3Endpoint')" >> $GITHUB_ENV
-          echo "S3_BUCKET=$(echo $RESPONSE | jq -r '.data.Buckets[0].s3Bucket')" >> $GITHUB_ENV
+
+          # 提取 s3Endpoint 和 s3Bucket
+          # 如果配置了 DOGE_BUCKET_NAME (例如 'blog')，则在返回的 Buckets 数组中匹配对应的 name
+          # 否则默认使用数组中的第一个 Bucket
+          if [ -n "$DOGE_BUCKET_NAME" ]; then
+            echo "Looking for bucket with name: $DOGE_BUCKET_NAME"
+            BUCKET_JSON=$(echo $RESPONSE | jq -c ".data.Buckets[] | select(.name == \"$DOGE_BUCKET_NAME\")")
+            if [ -z "$BUCKET_JSON" ]; then
+              echo "Error: Could not find bucket '$DOGE_BUCKET_NAME' in the API response."
+              exit 1
+            fi
+            echo "S3_ENDPOINT=$(echo $BUCKET_JSON | jq -r '.s3Endpoint')" >> $GITHUB_ENV
+            echo "S3_BUCKET=$(echo $BUCKET_JSON | jq -r '.s3Bucket')" >> $GITHUB_ENV
+          else
+            echo "S3_ENDPOINT=$(echo $RESPONSE | jq -r '.data.Buckets[0].s3Endpoint')" >> $GITHUB_ENV
+            echo "S3_BUCKET=$(echo $RESPONSE | jq -r '.data.Buckets[0].s3Bucket')" >> $GITHUB_ENV
+          fi
 
       # 3. 使用 AWS CLI 同步 dist 文件夹到多吉云
       - name: Deploy to DogeCloud S3
         env:
           AWS_DEFAULT_REGION: automatic
         run: |
-          # 优先使用用户在 Secrets 中配置的 Bucket Name，如果没有则使用 API 返回的默认 Bucket
-          TARGET_BUCKET="${{ secrets.DOGE_BUCKET_NAME }}"
-          if [ -z "$TARGET_BUCKET" ]; then
-            TARGET_BUCKET="$S3_BUCKET"
+          # 完全依赖 API 返回的 s3Bucket 和 s3Endpoint，这是最安全和推荐的做法
+          TARGET_BUCKET="$S3_BUCKET"
+          TARGET_ENDPOINT="$S3_ENDPOINT"
+          
+          # 确保 endpoint 包含 https:// 前缀
+          if [[ ! "$TARGET_ENDPOINT" == http* ]]; then
+            TARGET_ENDPOINT="https://$TARGET_ENDPOINT"
           fi
-          
-          echo "Deploying to bucket: $TARGET_BUCKET at endpoint: $S3_ENDPOINT"
-          
+
+          echo "Deploying to bucket: $TARGET_BUCKET at endpoint: $TARGET_ENDPOINT"
+
           aws s3 sync ./dist s3://$TARGET_BUCKET/ \
-            --endpoint-url $S3_ENDPOINT \
+            --endpoint-url $TARGET_ENDPOINT \
             --delete \
             --acl public-read
