@@ -21,10 +21,31 @@
     "contactPhone": "13800138000"
   },
   "timeline": [
-    { "time": "09:00", "title": "新郎迎亲", "desc": "良辰吉时，迎娶佳人" },
-    { "time": "11:00", "title": "宾客入场", "desc": "恭候亲友，合影留念" },
-    { "time": "12:08", "title": "神圣典礼", "desc": "交换戒指，许下誓言" },
-    { "time": "12:30", "title": "婚宴开始", "desc": "敬备喜酌，共享欢乐" }
+    {
+      "time": "09:00",
+      "title": "新郎迎亲",
+      "desc": "良辰吉时，迎娶佳人"
+    },
+    {
+      "time": "11:00",
+      "title": "宾客入场",
+      "desc": "恭候亲友，合影留念"
+    },
+    {
+      "time": "12:08",
+      "title": "神圣典礼",
+      "desc": "交换戒指，许下誓言"
+    },
+    {
+      "time": "12:30",
+      "title": "婚宴开始",
+      "desc": "敬备喜酌，共享欢乐"
+    }
+  ],
+  "gallery": [
+    "https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=800&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=800&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=800&auto=format&fit=crop"
   ],
   "music": {
     "url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"

@@ -15,24 +15,24 @@ import Location from '../components/Location.astro';
 	<!-- 全局背景音乐播放器 -->
 	<MusicPlayer />
 
-	<main class="w-full h-full bg-bg-base overflow-x-hidden">
+	<main class="w-full h-[100dvh] overflow-y-auto overflow-x-hidden snap-y snap-mandatory bg-bg-base scroll-smooth">
 		<!-- 1. 封面区 (Hero Section) -->
-		<Hero />
+		<div class="snap-start snap-always h-[100dvh] w-full relative"><Hero /></div>
 
 		<!-- 2. 诚挚邀请 (Invitation Letter) -->
-		<Invitation />
+		<div class="snap-start snap-always h-[100dvh] w-full relative"><Invitation /></div>
 
 		<!-- 3. 照片画廊 (Photo Gallery) -->
-		<Gallery />
+		<div class="snap-start snap-always h-[100dvh] w-full relative"><Gallery /></div>
 
 		<!-- 3.5 视频模块 (Video Section) -->
-		<VideoSection />
+		<div class="snap-start snap-always h-[100dvh] w-full relative"><VideoSection /></div>
 
 		<!-- 4. 婚礼流程 (Event Timeline) -->
-		<Timeline />
+		<div class="snap-start snap-always h-[100dvh] w-full relative"><Timeline /></div>
 
 		<!-- 5. 导航与场地 (Location & Map) -->
-		<Location />
+		<div class="snap-start snap-always h-[100dvh] w-full relative"><Location /></div>
 	</main>
 </Layout>
 
@@ -50,18 +50,19 @@ import Location from '../components/Location.astro';
 		fadeElements.forEach((el) => {
 			gsap.fromTo(el, 
 				{ 
-					y: 50, 
+					y: 30, 
 					opacity: 0 
 				},
 				{
 					y: 0,
 					opacity: 1,
-					duration: 1,
-					ease: "power3.out",
+					duration: 0.8,
+					ease: "power2.out",
 					scrollTrigger: {
 						trigger: el,
-						start: "top 85%", // 当元素顶部到达视口 85% 位置时触发
-						toggleActions: "play none none reverse" // 向上滚动时可以反向播放
+						scroller: "main", // 因为我们用了 main 作为滚动容器
+						start: "top 80%",
+						toggleActions: "play none none reverse"
 					}
 				}
 			);

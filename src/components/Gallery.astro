@@ -1,19 +1,12 @@
 ---
-import { Image } from 'astro:assets';
+import config from '../data/config.json';
 
-// 自动读取 src/assets/gallery/ 目录下的所有图片
-const imageFiles = import.meta.glob<{ default: ImageMetadata }>('/src/assets/gallery/*.{jpeg,jpg,png,gif,webp}', { eager: true });
-const images = Object.values(imageFiles).map(file => file.default);
+// 从配置文件读取图片列表
+const images = config.gallery || [];
 
-// 占位图（当文件夹为空时显示）
-const placeholders = [
-  "https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=800&auto=format&fit=crop"
-];
 ---
 
-<section class="py-20 bg-white relative">
+<section class="h-full w-full bg-white relative flex flex-col justify-center">
   <div class="text-center mb-10 gsap-fade-up">
     <h2 class="text-3xl font-serif text-primary mb-2 tracking-widest">幸福瞬间</h2>
     <p class="text-accent font-serif text-sm tracking-[0.2em] uppercase">Sweet Memories</p>
@@ -22,19 +15,11 @@ const placeholders = [
   <!-- Swiper 容器 -->
   <div class="swiper mySwiper w-full px-4 pb-12 gsap-fade-up">
     <div class="swiper-wrapper">
-      {images.length > 0 ? (
-        images.map((img, index) => (
+      {(
+        images.map((imgSrc, index) => (
           <div class="swiper-slide w-4/5 rounded-xl overflow-hidden shadow-lg border-4 border-white">
             <div class="aspect-[3/4] bg-gray-100 relative">
-              <Image src={img} alt={`婚纱照 ${index + 1}`} class="w-full h-full object-cover" />
-            </div>
-          </div>
-        ))
-      ) : (
-        placeholders.map((src, index) => (
-          <div class="swiper-slide w-4/5 rounded-xl overflow-hidden shadow-lg border-4 border-white">
-            <div class="aspect-[3/4] bg-gray-100 relative">
-              <img src={src} alt={`占位图 ${index + 1}`} class="w-full h-full object-cover" />
+              <img src={imgSrc} alt={`婚纱照 ${index + 1}`} class="w-full h-full object-cover" />
             </div>
           </div>
         ))
