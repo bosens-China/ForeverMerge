@@ -10,23 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        # v6+ 使用 node24，避免 Node 20 弃用告警
-        uses: actions/checkout@v6
+      # 与 VitePress 官方示例一致：先 checkout，再 pnpm/action-setup，再 setup-node + cache
+      # 顺序保证 setup-node 的 cache: pnpm 执行时 PATH 上已有 pnpm
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - name: Setup Node.js
-        # v6+ 使用 node24；项目构建仍使用下方指定的 Node 22
-        # cache: pnpm 缓存 pnpm store，与用 Corepack 还是 action-setup 装 pnpm 无关
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: "22" # Astro 要求的 Node 版本
-          cache: "pnpm"
-
-      - name: Setup pnpm via Corepack
-        # 避免 pnpm/action-setup（当前 release 仍为 node20）触发弃用提示
-        run: |
-          corepack enable
-          corepack prepare pnpm@10 --activate
+          node-version: "24" # Astro 要求；VitePress 示例为 24，按项目需要即可
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install
@@ -114,7 +112,7 @@ jobs:
           # 完全依赖 API 返回的 s3Bucket 和 s3Endpoint，这是最安全和推荐的做法
           TARGET_BUCKET="$S3_BUCKET"
           TARGET_ENDPOINT="$S3_ENDPOINT"
-          
+
           # 确保 endpoint 包含 https:// 前缀
           if [[ ! "$TARGET_ENDPOINT" == http* ]]; then
             TARGET_ENDPOINT="https://$TARGET_ENDPOINT"
