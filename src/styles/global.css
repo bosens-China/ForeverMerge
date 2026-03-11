@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/* 
+ * 如果后续需要引入外部自定义字体，请取消注释并替换 url
+ * font-display: swap 确保在字体下载完成前使用系统默认字体，避免文字不可见
+ */
+/*
+@font-face {
+  font-family: 'CustomSerif';
+  src: url('/fonts/custom-serif.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
 @theme {
   --color-primary: #C8161D;
   --color-accent: #D4AF37;
@@ -9,6 +23,39 @@
   --font-serif: "STSong", "Songti SC", "Noto Serif CJK SC", serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", "Helvetica Neue", sans-serif;
+
+  --animate-shimmer: shimmer 2.5s infinite;
+  --animate-heartbeat: heartbeat 1.5s ease-in-out infinite both;
+  
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes heartbeat {
+    from {
+      transform: scale(1);
+      transform-origin: center center;
+      animation-timing-function: ease-out;
+    }
+    10% {
+      transform: scale(0.91);
+      animation-timing-function: ease-in;
+    }
+    17% {
+      transform: scale(0.98);
+      animation-timing-function: ease-out;
+    }
+    33% {
+      transform: scale(0.87);
+      animation-timing-function: ease-in;
+    }
+    45% {
+      transform: scale(1);
+      animation-timing-function: ease-out;
+    }
+  }
 }
 
 @layer base {

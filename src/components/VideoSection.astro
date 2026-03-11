@@ -14,6 +14,7 @@ const video = config.video;
     <div class="rounded-2xl overflow-hidden shadow-lg border border-accent/20 bg-white p-2">
       <!-- 视频容器：默认读取 public/video/main.mp4 -->
       <video 
+        id="wedding-video"
         class="w-full rounded-xl object-cover aspect-[9/16] bg-gray-100"
         controls 
         playsinline
@@ -30,3 +31,26 @@ const video = config.video;
     </div>
   </div>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const video = document.getElementById('wedding-video') as HTMLVideoElement;
+    
+    if (video) {
+      video.addEventListener('play', () => {
+        // 视频播放时暂停背景音乐
+        window.dispatchEvent(new Event('pauseBgm'));
+      });
+
+      video.addEventListener('pause', () => {
+        // 视频暂停时恢复背景音乐
+        window.dispatchEvent(new Event('resumeBgm'));
+      });
+
+      video.addEventListener('ended', () => {
+        // 视频结束时恢复背景音乐
+        window.dispatchEvent(new Event('resumeBgm'));
+      });
+    }
+  });
+</script>

@@ -3,9 +3,12 @@ import { Music } from '@lucide/astro';
 import config from '../data/config.json';
 ---
 
-<div id="music-player" class="fixed top-[calc(var(--safe-top)+1rem)] right-[calc(var(--safe-right)+1rem)] z-50 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md shadow-lg flex items-center justify-center cursor-pointer border border-accent/30 transition-transform active:scale-95">
-  <div id="music-icon" class="text-primary animate-spin-slow">
+<div id="music-player" class="fixed top-[calc(var(--safe-top)+1rem)] right-[calc(var(--safe-right)+1rem)] z-50 w-11 h-11 rounded-full bg-white/80 backdrop-blur-md shadow-lg flex items-center justify-center cursor-pointer border border-accent/30 transition-transform active:scale-95">
+  <div id="music-icon-play" class="text-primary animate-spin-slow">
     <Music size={20} />
+  </div>
+  <div id="music-icon-pause" class="text-text-main/50 hidden">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="2" x2="22" y2="22"></line><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
   </div>
   <!-- 实际使用时替换 src 为你的音乐链接 -->
   <audio id="bgm" loop preload="auto">
@@ -17,49 +20,86 @@ import config from '../data/config.json';
   .animate-spin-slow {
     animation: spin 4s linear infinite;
   }
-  .paused {
-    animation-play-state: paused;
-  }
 </style>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const player = document.getElementById('music-player');
-    const icon = document.getElementById('music-icon');
+    const iconPlay = document.getElementById('music-icon-play');
+    const iconPause = document.getElementById('music-icon-pause');
     const audio = document.getElementById('bgm') as HTMLAudioElement;
     
     let isPlaying = false;
+
+    const updateIconState = (playing: boolean) => {
+      if (playing) {
+        iconPlay?.classList.remove('hidden');
+        iconPause?.classList.add('hidden');
+      } else {
+        iconPlay?.classList.add('hidden');
+        iconPause?.classList.remove('hidden');
+      }
+    };
 
     // 微信/移动端自动播放策略：需要用户首次交互
     const initPlay = () => {
       if (!isPlaying) {
         audio.play().then(() => {
           isPlaying = true;
-          icon?.classList.remove('paused');
+          updateIconState(true);
         }).catch(() => {
           // 自动播放被阻止
           isPlaying = false;
-          icon?.classList.add('paused');
+          updateIconState(false);
         });
       }
       document.removeEventListener('touchstart', initPlay);
       document.removeEventListener('click', initPlay);
     };
 
+    // 通用浏览器：等待首次交互
     document.addEventListener('touchstart', initPlay, { once: true });
     document.addEventListener('click', initPlay, { once: true });
+
+    // 微信特权：WeixinJSBridgeReady 触发时直接播放，无需等待交互
+    document.addEventListener("WeixinJSBridgeReady", () => {
+      if (!isPlaying) {
+        audio.play().then(() => {
+          isPlaying = true;
+          updateIconState(true);
+        }).catch(() => {});
+      }
+    }, false);
 
     // 点击切换播放/暂停
     player?.addEventListener('click', (e) => {
       e.stopPropagation(); // 阻止冒泡触发全局 initPlay
       if (isPlaying) {
         audio.pause();
-        icon?.classList.add('paused');
+        updateIconState(false);
       } else {
         audio.play();
-        icon?.classList.remove('paused');
+        updateIconState(true);
       }
       isPlaying = !isPlaying;
+    });
+
+    // 监听来自视频组件的事件
+    window.addEventListener('pauseBgm', () => {
+      if (isPlaying) {
+        audio.pause();
+        updateIconState(false);
+        // 标记是因为视频播放而暂停的，以便后续恢复
+        player?.setAttribute('data-video-paused', 'true');
+      }
+    });
+
+    window.addEventListener('resumeBgm', () => {
+      if (player?.getAttribute('data-video-paused') === 'true') {
+        audio.play();
+        updateIconState(true);
+        player?.removeAttribute('data-video-paused');
+      }
     });
   });
 </script>

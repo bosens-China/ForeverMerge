@@ -36,9 +36,10 @@ import config from '../data/config.json';
       <!-- 操作按钮 -->
       <div class="flex gap-4">
         <!-- 导航按钮：实际使用时可以替换为高德/百度地图的 URI -->
-        <a href={config.weddingInfo.hotel.mapLink} target="_blank" rel="noopener noreferrer" class="flex-1 bg-primary text-white py-3 rounded-full flex items-center justify-center gap-2 text-sm tracking-widest shadow-md active:scale-95 transition-transform">
-          <MapPin size={16} />
-          一键导航
+        <a href={config.weddingInfo.hotel.mapLink} target="_blank" rel="noopener noreferrer" class="relative overflow-hidden flex-1 bg-primary text-white py-3 rounded-full flex items-center justify-center gap-2 text-sm tracking-widest shadow-md active:scale-95 transition-transform group">
+          <div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-[shimmer_1.5s_infinite] animate-[shimmer_2.5s_infinite]"></div>
+          <MapPin size={16} class="relative z-10" />
+          <span class="relative z-10">一键导航</span>
         </a>
         <!-- 拨打电话 -->
         <a href={`tel:${config.weddingInfo.contactPhone}`} class="flex-1 bg-white text-primary border border-primary py-3 rounded-full flex items-center justify-center gap-2 text-sm tracking-widest shadow-sm active:scale-95 transition-transform">

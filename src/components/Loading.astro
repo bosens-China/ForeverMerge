@@ -1,0 +1,41 @@
+---
+import config from '../data/config.json';
+---
+
+<div id="global-loading" class="fixed inset-0 z-[9999] bg-bg-base flex flex-col items-center justify-center transition-opacity duration-700">
+  <div class="relative flex flex-col items-center">
+    <!-- 跳动的心 -->
+    <div class="w-12 h-12 mb-8 text-primary animate-heartbeat">
+      <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+    </div>
+    
+    <!-- 名字首字母或全名 -->
+    <div class="flex items-center gap-3 font-serif text-2xl text-text-main tracking-widest">
+      <span>{config.groom.pinyin[0]}</span>
+      <span class="text-accent text-lg">&</span>
+      <span>{config.bride.pinyin[0]}</span>
+    </div>
+    
+    <div class="mt-4 text-xs text-text-main/50 tracking-[0.2em] uppercase font-serif">
+      Loading...
+    </div>
+  </div>
+</div>
+
+<script>
+  // 页面所有资源（包括图片）加载完成后隐藏 loading
+  window.addEventListener('load', () => {
+    const loader = document.getElementById('global-loading');
+    if (loader) {
+      // 稍微延迟一下，确保视觉过渡更平滑
+      setTimeout(() => {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+          loader.style.display = 'none';
+        }, 700); // 等待 CSS transition 完成
+      }, 500);
+    }
+  });
+</script>
