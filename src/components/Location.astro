@@ -1,0 +1,56 @@
+---
+import { MapPin, Phone } from '@lucide/astro';
+import config from '../data/config.json';
+---
+
+<section class="py-20 bg-white relative pb-32">
+  <div class="text-center mb-10 gsap-fade-up">
+    <h2 class="text-3xl font-serif text-primary mb-2 tracking-widest">婚礼地址</h2>
+    <p class="text-accent font-serif text-sm tracking-[0.2em] uppercase">Location & Contact</p>
+  </div>
+
+  <div class="max-w-sm mx-auto px-6 gsap-fade-up">
+    <!-- 地图占位图 -->
+    <div class="w-full h-48 bg-gray-200 rounded-t-2xl overflow-hidden relative">
+      <img src={config.weddingInfo.hotel.coverImage} alt="酒店外观" class="w-full h-full object-cover opacity-80" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4">
+        <span class="text-white font-serif tracking-widest">{config.weddingInfo.hotel.name}</span>
+      </div>
+    </div>
+
+    <!-- 地址信息卡片 -->
+    <div class="bg-bg-base p-6 rounded-b-2xl shadow-lg border border-t-0 border-accent/20">
+      <div class="flex items-start gap-3 mb-6">
+        <div class="text-primary mt-1">
+          <MapPin size={20} />
+        </div>
+        <div>
+          <h3 class="font-serif text-lg text-text-main mb-1">{config.weddingInfo.hotel.hall}</h3>
+          <p class="text-sm text-text-main/70 leading-relaxed">
+            {config.weddingInfo.hotel.address}<br/>
+            {config.weddingInfo.hotel.subAddress}
+          </p>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="flex gap-4">
+        <!-- 导航按钮：实际使用时可以替换为高德/百度地图的 URI -->
+        <a href={config.weddingInfo.hotel.mapLink} target="_blank" rel="noopener noreferrer" class="flex-1 bg-primary text-white py-3 rounded-full flex items-center justify-center gap-2 text-sm tracking-widest shadow-md active:scale-95 transition-transform">
+          <MapPin size={16} />
+          一键导航
+        </a>
+        <!-- 拨打电话 -->
+        <a href={`tel:${config.weddingInfo.contactPhone}`} class="flex-1 bg-white text-primary border border-primary py-3 rounded-full flex items-center justify-center gap-2 text-sm tracking-widest shadow-sm active:scale-95 transition-transform">
+          <Phone size={16} />
+          联系我们
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部装饰 -->
+  <div class="absolute bottom-8 left-0 w-full text-center text-xs text-text-main/40 font-serif tracking-widest">
+    期待您的光临 · 见证我们的幸福
+  </div>
+</section>

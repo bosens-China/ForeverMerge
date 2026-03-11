@@ -1,0 +1,65 @@
+---
+import { Music } from '@lucide/astro';
+import config from '../data/config.json';
+---
+
+<div id="music-player" class="fixed top-4 right-4 z-50 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md shadow-lg flex items-center justify-center cursor-pointer border border-accent/30 transition-transform active:scale-95">
+  <div id="music-icon" class="text-primary animate-spin-slow">
+    <Music size={20} />
+  </div>
+  <!-- 实际使用时替换 src 为你的音乐链接 -->
+  <audio id="bgm" loop preload="auto">
+    <source src={config.music.url} type="audio/mpeg" />
+  </audio>
+</div>
+
+<style>
+  .animate-spin-slow {
+    animation: spin 4s linear infinite;
+  }
+  .paused {
+    animation-play-state: paused;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const player = document.getElementById('music-player');
+    const icon = document.getElementById('music-icon');
+    const audio = document.getElementById('bgm') as HTMLAudioElement;
+    
+    let isPlaying = false;
+
+    // 微信/移动端自动播放策略：需要用户首次交互
+    const initPlay = () => {
+      if (!isPlaying) {
+        audio.play().then(() => {
+          isPlaying = true;
+          icon?.classList.remove('paused');
+        }).catch(() => {
+          // 自动播放被阻止
+          isPlaying = false;
+          icon?.classList.add('paused');
+        });
+      }
+      document.removeEventListener('touchstart', initPlay);
+      document.removeEventListener('click', initPlay);
+    };
+
+    document.addEventListener('touchstart', initPlay, { once: true });
+    document.addEventListener('click', initPlay, { once: true });
+
+    // 点击切换播放/暂停
+    player?.addEventListener('click', (e) => {
+      e.stopPropagation(); // 阻止冒泡触发全局 initPlay
+      if (isPlaying) {
+        audio.pause();
+        icon?.classList.add('paused');
+      } else {
+        audio.play();
+        icon?.classList.remove('paused');
+      }
+      isPlaying = !isPlaying;
+    });
+  });
+</script>

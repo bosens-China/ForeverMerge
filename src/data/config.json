@@ -1,0 +1,32 @@
+{
+  "groom": {
+    "name": "新郎名",
+    "pinyin": "Xinlang"
+  },
+  "bride": {
+    "name": "新娘名",
+    "pinyin": "Xinniang"
+  },
+  "weddingInfo": {
+    "date": "2026 . 10 . 01",
+    "lunarDate": "农历八月廿一",
+    "hotel": {
+      "name": "某某国际大酒店",
+      "hall": "二楼 龙凤呈祥厅",
+      "address": "浙江省杭州市某某区某某路 888 号",
+      "subAddress": "(地铁 1 号线某某站 A 出口步行 200 米)",
+      "mapLink": "https://uri.amap.com/marker?position=120.153576,30.287459&name=某某国际大酒店",
+      "coverImage": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=800&auto=format&fit=crop"
+    },
+    "contactPhone": "13800138000"
+  },
+  "timeline": [
+    { "time": "09:00", "title": "新郎迎亲", "desc": "良辰吉时，迎娶佳人" },
+    { "time": "11:00", "title": "宾客入场", "desc": "恭候亲友，合影留念" },
+    { "time": "12:08", "title": "神圣典礼", "desc": "交换戒指，许下誓言" },
+    { "time": "12:30", "title": "婚宴开始", "desc": "敬备喜酌，共享欢乐" }
+  ],
+  "music": {
+    "url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+  }
+}

@@ -1,0 +1,69 @@
+---
+import config from '../data/config.json';
+---
+
+<section id="hero" class="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-bg-base">
+  <!-- 背景图占位 -->
+  <div class="absolute inset-0 w-full h-full z-0">
+    <!-- 替换为真实图片时，使用 object-cover -->
+    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+      <span class="text-gray-400 font-sans">婚纱照占位图 (竖版)</span>
+    </div>
+    <!-- 渐变遮罩，确保文字清晰 -->
+    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+  </div>
+
+  <!-- 内容层 -->
+  <div class="relative z-10 flex flex-col items-center justify-end w-full h-full pb-24 text-white">
+    <!-- 顶部装饰 -->
+    <div class="hero-element opacity-0 translate-y-4 mb-6 text-accent">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+    </div>
+
+    <!-- 名字 -->
+    <div class="hero-element opacity-0 translate-y-4 flex items-center gap-4 mb-4">
+      <h1 class="text-4xl md:text-5xl font-serif font-medium tracking-widest">{config.groom.name}</h1>
+      <span class="text-2xl text-accent font-serif italic">&</span>
+      <h1 class="text-4xl md:text-5xl font-serif font-medium tracking-widest">{config.bride.name}</h1>
+    </div>
+
+    <!-- 英文名/拼音 (增加层次感) -->
+    <p class="hero-element opacity-0 translate-y-4 text-sm md:text-base font-serif tracking-[0.3em] uppercase text-white/80 mb-8">
+      {config.groom.pinyin} & {config.bride.pinyin}
+    </p>
+
+    <!-- 日期与地点 -->
+    <div class="hero-element opacity-0 translate-y-4 flex flex-col items-center gap-2 text-sm md:text-base tracking-widest bg-black/20 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20">
+      <p>{config.weddingInfo.date}</p>
+      <div class="w-8 h-[1px] bg-accent/50"></div>
+      <p>{config.weddingInfo.hotel.name} · {config.weddingInfo.hotel.hall.split(' ')[1] || '宴会厅'}</p>
+    </div>
+  </div>
+
+  <!-- 底部滑动提示 -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/70">
+    <span class="text-xs tracking-widest font-serif uppercase">向上滑动</span>
+    <div class="w-5 h-8 border border-white/50 rounded-full flex justify-center pt-1">
+      <div class="w-1 h-2 bg-white rounded-full animate-bounce"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+
+  // 等待 DOM 加载完成
+  document.addEventListener("DOMContentLoaded", () => {
+    // 简单的入场动画
+    gsap.to(".hero-element", {
+      y: 0,
+      opacity: 1,
+      duration: 1.2,
+      stagger: 0.2,
+      ease: "power3.out",
+      delay: 0.2
+    });
+  });
+</script>
