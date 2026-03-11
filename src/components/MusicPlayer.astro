@@ -3,7 +3,7 @@ import { Music } from '@lucide/astro';
 import config from '../data/config.json';
 ---
 
-<div id="music-player" class="fixed top-4 right-4 z-50 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md shadow-lg flex items-center justify-center cursor-pointer border border-accent/30 transition-transform active:scale-95">
+<div id="music-player" class="fixed top-[calc(var(--safe-top)+1rem)] right-[calc(var(--safe-right)+1rem)] z-50 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md shadow-lg flex items-center justify-center cursor-pointer border border-accent/30 transition-transform active:scale-95">
   <div id="music-icon" class="text-primary animate-spin-slow">
     <Music size={20} />
   </div>

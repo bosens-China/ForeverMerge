@@ -2,7 +2,7 @@
 import config from '../data/config.json';
 ---
 
-<section id="hero" class="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-bg-base">
+<section id="hero" class="relative w-full screen-section overflow-hidden flex flex-col items-center justify-center bg-bg-base">
   <!-- 背景图占位 -->
   <div class="absolute inset-0 w-full h-full z-0">
     <!-- 替换为真实图片时，使用 object-cover -->
@@ -14,7 +14,7 @@ import config from '../data/config.json';
   </div>
 
   <!-- 内容层 -->
-  <div class="relative z-10 flex flex-col items-center justify-end w-full h-full pb-24 text-white">
+  <div class="relative z-10 flex flex-col items-center justify-end w-full h-full px-6 pb-[calc(var(--safe-bottom)+6rem)] text-white">
     <!-- 顶部装饰 -->
     <div class="hero-element opacity-0 translate-y-4 mb-6 text-accent">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
@@ -43,7 +43,7 @@ import config from '../data/config.json';
   </div>
 
   <!-- 底部滑动提示 -->
-  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/70">
+  <div class="absolute bottom-[calc(var(--safe-bottom)+2rem)] left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/70">
     <span class="text-xs tracking-widest font-serif uppercase">向上滑动</span>
     <div class="w-5 h-8 border border-white/50 rounded-full flex justify-center pt-1">
       <div class="w-1 h-2 bg-white rounded-full animate-bounce"></div>

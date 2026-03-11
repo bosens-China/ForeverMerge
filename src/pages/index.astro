@@ -15,24 +15,27 @@ import Location from '../components/Location.astro';
 	<!-- 全局背景音乐播放器 -->
 	<MusicPlayer />
 
-	<main class="w-full h-[100dvh] overflow-y-auto overflow-x-hidden snap-y snap-mandatory bg-bg-base scroll-smooth">
+	<main
+		class="page-scroller w-full overflow-y-auto overflow-x-hidden snap-y snap-mandatory bg-bg-base touch-pan-y"
+		data-page-scroller
+	>
 		<!-- 1. 封面区 (Hero Section) -->
-		<div class="snap-start snap-always h-[100dvh] w-full relative"><Hero /></div>
+		<div class="screen-section snap-start snap-always w-full relative" data-screen><Hero /></div>
 
 		<!-- 2. 诚挚邀请 (Invitation Letter) -->
-		<div class="snap-start snap-always h-[100dvh] w-full relative"><Invitation /></div>
+		<div class="screen-section snap-start snap-always w-full relative" data-screen><Invitation /></div>
 
 		<!-- 3. 照片画廊 (Photo Gallery) -->
-		<div class="snap-start snap-always h-[100dvh] w-full relative"><Gallery /></div>
+		<div class="screen-section snap-start snap-always w-full relative" data-screen><Gallery /></div>
 
 		<!-- 3.5 视频模块 (Video Section) -->
-		<div class="snap-start snap-always h-[100dvh] w-full relative"><VideoSection /></div>
+		<div class="screen-section snap-start snap-always w-full relative" data-screen><VideoSection /></div>
 
 		<!-- 4. 婚礼流程 (Event Timeline) -->
-		<div class="snap-start snap-always h-[100dvh] w-full relative"><Timeline /></div>
+		<div class="screen-section snap-start snap-always w-full relative" data-screen><Timeline /></div>
 
 		<!-- 5. 导航与场地 (Location & Map) -->
-		<div class="snap-start snap-always h-[100dvh] w-full relative"><Location /></div>
+		<div class="screen-section snap-start snap-always w-full relative" data-screen><Location /></div>
 	</main>
 </Layout>
 
@@ -44,6 +47,108 @@ import Location from '../components/Location.astro';
 	gsap.registerPlugin(ScrollTrigger);
 
 	document.addEventListener("DOMContentLoaded", () => {
+		const pageScroller = document.querySelector<HTMLElement>("[data-page-scroller]");
+		const screens = Array.from(document.querySelectorAll<HTMLElement>("[data-screen]"));
+		let currentIndex = 0;
+		let touchStartX = 0;
+		let touchStartY = 0;
+		let touchStartAt = 0;
+		let isTransitioning = false;
+
+		const clampIndex = (value: number) => Math.max(0, Math.min(value, screens.length - 1));
+		const syncIndexFromScroll = () => {
+			if (!pageScroller) {
+				return;
+			}
+
+			const scrollTop = pageScroller.scrollTop;
+			currentIndex = screens.reduce((closestIndex, screen, index) => {
+				const closestDistance = Math.abs(screens[closestIndex].offsetTop - scrollTop);
+				const nextDistance = Math.abs(screen.offsetTop - scrollTop);
+				return nextDistance < closestDistance ? index : closestIndex;
+			}, currentIndex);
+		};
+		const goToScreen = (nextIndex: number) => {
+			if (!pageScroller || isTransitioning) {
+				return;
+			}
+
+			const targetIndex = clampIndex(nextIndex);
+			if (targetIndex === currentIndex && Math.abs(pageScroller.scrollTop - screens[targetIndex].offsetTop) < 4) {
+				return;
+			}
+
+			currentIndex = targetIndex;
+			isTransitioning = true;
+			pageScroller.scrollTo({
+				top: screens[targetIndex].offsetTop,
+				behavior: "smooth"
+			});
+
+			window.setTimeout(() => {
+				isTransitioning = false;
+				syncIndexFromScroll();
+			}, 550);
+		};
+
+		pageScroller?.addEventListener("scroll", () => {
+			if (!isTransitioning) {
+				syncIndexFromScroll();
+			}
+		}, { passive: true });
+
+		pageScroller?.addEventListener("wheel", (event) => {
+			if (Math.abs(event.deltaY) < 24) {
+				return;
+			}
+
+			event.preventDefault();
+			goToScreen(currentIndex + (event.deltaY > 0 ? 1 : -1));
+		}, { passive: false });
+
+		pageScroller?.addEventListener("touchstart", (event) => {
+			const touch = event.changedTouches[0];
+			touchStartX = touch.clientX;
+			touchStartY = touch.clientY;
+			touchStartAt = window.performance.now();
+			syncIndexFromScroll();
+		}, { passive: true });
+
+		pageScroller?.addEventListener("touchend", (event) => {
+			if (isTransitioning) {
+				return;
+			}
+
+			const touch = event.changedTouches[0];
+			const deltaX = touch.clientX - touchStartX;
+			const deltaY = touch.clientY - touchStartY;
+			const duration = window.performance.now() - touchStartAt;
+
+			if (Math.abs(deltaY) < 56 || Math.abs(deltaY) <= Math.abs(deltaX)) {
+				return;
+			}
+
+			if (duration > 900 && Math.abs(deltaY) < 96) {
+				return;
+			}
+
+			goToScreen(currentIndex + (deltaY < 0 ? 1 : -1));
+		}, { passive: true });
+
+		pageScroller?.addEventListener("keydown", (event) => {
+			if (event.key === "ArrowDown" || event.key === "PageDown") {
+				event.preventDefault();
+				goToScreen(currentIndex + 1);
+			}
+
+			if (event.key === "ArrowUp" || event.key === "PageUp") {
+				event.preventDefault();
+				goToScreen(currentIndex - 1);
+			}
+		});
+
+		pageScroller?.setAttribute("tabindex", "0");
+
 		// 为所有带有 gsap-fade-up 类的元素添加滚动渐显动画
 		const fadeElements = document.querySelectorAll('.gsap-fade-up');
 		

@@ -1,4 +1,7 @@
 ---
+import config from '../data/config.json';
+
+const video = config.video;
 ---
 
 <section class="h-full w-full bg-bg-base relative flex flex-col justify-center">
@@ -16,12 +19,12 @@
         playsinline
         webkit-playsinline
         preload="metadata"
-        poster="/video/poster.jpg"
+        poster={video.poster}
       >
-        <source src="/video/main.mp4" type="video/mp4" />
+        <source src={video.src} type={video.type} />
         <p class="text-center py-10 text-text-main/50 text-sm">
           暂无视频或您的浏览器不支持视频播放。<br/>
-          (请将视频放置于 public/video/main.mp4)
+          (请在配置中填写可访问的视频地址)
         </p>
       </video>
     </div>
